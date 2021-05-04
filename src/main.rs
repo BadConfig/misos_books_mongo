@@ -17,6 +17,10 @@ use books::users::routes::{
     get_books,
     add_book,
 };
+use actix_web_dev::routes::{
+    list,
+    delete_user,
+};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -30,9 +34,8 @@ async fn main() -> std::io::Result<()> {
         Ok(_) => print!("migration success\n"),
         Err(e)=> print!("migration error: {}\n",&e),
     };
-    let client = mongodb::Client::with_uri_str("mongodb://localhost:27017/")
-        .await
-        .unwrap();
+    let client = mongodb::Client::with_uri_str("mongodb://books_mongo:27017/")
+        .await.unwrap();
     let db = client.database("admin");
     db.create_collection("books", None)
         .await;
@@ -54,14 +57,18 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .service(web::scope("/api")
                 .service(web::scope("/user")
-                    .route("/get", web::get().to(get))
-                    .route("/login", web::get().to(login))
+                    .route("/get", web::post().to(get))
+                    .route("/login", web::post().to(login))
                     .route("/create", web::post().to(create))
                 )
                 .service(web::scope("/book")
-                    .route("/get", web::get().to(get_books))
+                    .route("/get", web::post().to(get_books))
                     .route("/add", web::post().to(add_book))
                     .route("/rm", web::post().to(rm_book))
+                )
+                .service(web::scope("/auth")
+                    .route("/list", web::post().to(list))
+                    .route("/delete", web::post().to(delete_user))
                 )
             )
     })

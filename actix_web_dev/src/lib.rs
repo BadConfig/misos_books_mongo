@@ -13,6 +13,7 @@ extern crate env_logger;
 pub(crate) mod schema;
 pub mod error;
 pub mod auth;
+pub mod routes;
 
 pub fn init_auth(connection: &PgConnection) {
     embed_migrations!("./migrations");

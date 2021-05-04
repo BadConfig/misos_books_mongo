@@ -23,6 +23,7 @@ RUN apt-get update && \
         --no-install-recommends
 RUN apt-get update && apt-get -y install ca-certificates libssl-dev && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /books/target/release/books /books/books
+COPY ./migrations ./books/migrations/
 WORKDIR /books/
 EXPOSE 8088
 

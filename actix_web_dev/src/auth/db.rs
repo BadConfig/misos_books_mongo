@@ -49,6 +49,14 @@ impl Auth {
             .execute(conn)?;
         Ok(())
     }
+    
+    pub async fn list(
+        conn: &PgConnection,
+    ) -> Result<Vec<Auth>> {
+        let r = auth::table
+            .load(conn)?;
+        Ok(r)
+    }
 
     pub async fn delete(
         login: &str,

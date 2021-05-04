@@ -4,7 +4,7 @@ use actix_web::{
     HttpServer, HttpRequest, Responder,
 };
 use serde::Deserialize;
-use crate::db::Auth;
+use crate::auth::db::Auth;
 use diesel::PgConnection;
 use diesel::r2d2::ConnectionManager;
 pub type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
@@ -15,7 +15,7 @@ pub struct UserData {
     login: String,
     auth_type: String,
 }
-use crate::db::AuthSecret;
+use crate::auth::db::AuthSecret;
 
 pub async fn send_jwt(
     query: web::Json<UserData>,
@@ -72,4 +72,12 @@ pub async fn delete_user(
     let conn = conn.get()?;
     Auth::delete(&form.login, &conn).await?;
     Ok(HttpResponse::Ok().json(json!({"code":200})))
+}
+
+pub async fn list(
+    conn: web::Data<DbPool>,
+) -> Result<HttpResponse,ApiError> {
+    let conn = conn.get()?;
+    let r = Auth::list(&conn).await?;
+    Ok(HttpResponse::Ok().json(r))
 }
